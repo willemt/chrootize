@@ -1,0 +1,62 @@
+#!/bin/bash
+
+#mkdir bin dev etc etc/pam.d home lib lib/security var var/log usr usr/bin
+
+function importlibs {
+
+	exe=$1
+
+	ii=0
+
+	for lib in $(otool -L "$exe" | cut -d " " -f 1); do
+		ii=$ii+1
+
+		# Skip the first output of otool
+		if [[ $ii -eq 1 ]];
+		then
+			continue
+		fi
+
+		# Remove basename
+		#x=${lib%%.*}
+		x=$(dirname "$lib")
+
+		# Remove front /
+		x=${x/\//}/; 
+		
+		# Check if the library already exists there
+		if [ -e "$x$(basename $lib)" ]
+		then
+			: # Don't do anything if the library is here already
+		else
+			# Make folder for library
+			mkdir -p $x
+
+			# Move library over
+			echo "Lib: $lib"
+			cp $lib $x
+			
+			# Import the libraries of the libraries
+			importlibs $lib
+		fi
+	done
+}
+
+# Make sure dyld is available
+if [ -e "usr/lib/dyld" ]
+then
+	:
+else
+	mkdir -p usr/lib
+	cp /usr/lib/dyld usr/lib/
+fi
+
+# Move executable
+exe=$(which $1)
+x=$(dirname "$exe")
+x=${x/\//}/; 
+mkdir -p $x
+cp $exe $x
+
+# Make sure we import all the correct libraries
+importlibs $exe

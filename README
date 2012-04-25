@@ -1,0 +1,29 @@
+
+NAME
+    chrootize - place command's binary and libraries in a chroot jail
+
+SYNOPSIS
+    chrootize [command] 
+
+DESCRIPTION
+    chrootize is a simple script that uses the current directory as a chroot
+    jail. chrootize will recursively ensure that all libraries required by the
+    command are imported into the chroot jail. 
+
+SEE ALSO
+    chroot(1), otool(1)
+
+BUGS
+    chrootize is not smart enough to copy over other non-library dependencies
+    that the command might have, eg. Python site packages
+
+    If you find a bug or want to implement new features, please report it
+    at https://github.com/chrootize/issues
+
+AUTHORS
+    Copyright (c) 2012 Willem Thiart <himself@willemthiart.com>
+
+COPYING
+    chrootize is distributed under the GNU Lesser General Public License
+    (LGPL 2.1 or greater).
+
